@@ -29,5 +29,6 @@ public class Box<T extends Fruit> {
             return;
         }
         fruits.forEach(consumer::addFruit);
+        fruits.clear();
     }
 }
