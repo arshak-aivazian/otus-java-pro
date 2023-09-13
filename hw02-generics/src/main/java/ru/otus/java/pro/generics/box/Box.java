@@ -21,10 +21,13 @@ public class Box<T extends Fruit> {
     }
 
     public boolean compare(Box<?> box) {
-        return this.weight() == box.weight();
+        return box != null && this.weight() == box.weight();
     }
 
     public void moveFruitsTo(Box<? super T> consumer) {
+        if (consumer == null) {
+            return;
+        }
         fruits.forEach(consumer::addFruit);
     }
 }
