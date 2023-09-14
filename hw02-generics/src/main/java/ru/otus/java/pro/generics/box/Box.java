@@ -25,7 +25,7 @@ public class Box<T extends Fruit> {
     }
 
     public void moveFruitsTo(Box<? super T> consumer) {
-        if (consumer == null) {
+        if (consumer == null || this == consumer) {
             return;
         }
         fruits.forEach(consumer::addFruit);
