@@ -54,6 +54,6 @@ public class Atm implements CashTransactionHandler, BalanceAware {
     private boolean isSuitableCell(CashCell cell, int requiredCashAmount, Currency requiredCurrency) {
         return cell.getDenomination().getCurrency() == requiredCurrency
                 && cell.getCashAmount() % requiredCashAmount == 0
-                && cell.getCashAmount() / requiredCashAmount > 1;
+                && cell.getCashAmount() / requiredCashAmount >= 1;
     }
 }
