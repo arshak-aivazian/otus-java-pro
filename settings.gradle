@@ -1,2 +1,3 @@
 rootProject.name = 'otus-java-pro'
+include 'hw11-jpql'
 
