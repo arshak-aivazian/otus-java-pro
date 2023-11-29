@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Банкомат</title>
+</head>
+<body>
+    <p>Выберите дальнейшее действие<p>
+        <a class="button" th:href="@{/atm/get-money}">
+            <button>Получить наличные</button>
+        </a>
+        <br/>
+        <a class="button" th:href="@{/atm/put-money}">
+            <button>Внести наличные</button>
+        </a>
+        <br/>
+        <a class="button" th:href="@{/atm/check-balance}">
+            <button>Проверить остаток</button>
+        </a>
+        <br/>
+        <a class="button" th:href="@{/atm/change-pin}">
+            <button>Поменять пароль</button>
+        </a>
+        <br/>
+        <a class="button" th:href="@{/atm/logout}">
+            <button>Выйти</button>
+        </a>
+</body>
+</html>

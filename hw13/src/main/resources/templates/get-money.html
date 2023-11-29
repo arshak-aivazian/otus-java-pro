@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Банкомат</title>
+</head>
+<body>
+    <p>Введите сумму, которую хотите снять<p>
+    <form th:method="POST" th:action="@{/atm/get-money}">
+        <fieldset>
+            <input type="text" name="amount" />
+            <input type="submit" value="Снять" />
+        </fieldset>
+    </form>
+</body>
+</html>
