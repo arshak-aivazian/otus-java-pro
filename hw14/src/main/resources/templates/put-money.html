@@ -1,0 +1,19 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Банкомат</title>
+</head>
+<body>
+<p>Введите значение номинала и количество купюр, которые хотите внести<p>
+<form th:method="POST" th:action="@{/atm/put-money}">
+    <fieldset>
+        <p>Номинал</p>
+        <input type="number" name="note" />
+        <br/>
+        <p>Количество купюр</p>
+        <input type="number" name="count" />
+        <input type="submit" value="Внести" />
+    </fieldset>
+</form>
+</body>
+</html>
