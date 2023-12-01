@@ -1,43 +1,36 @@
 package com.example.hw14.web.controller;
 
-import com.example.hw14.cashmachine.bank.dao.AccountDao;
-import com.example.hw14.cashmachine.bank.dao.CardsDao;
-import com.example.hw14.cashmachine.bank.data.Account;
-import com.example.hw14.cashmachine.bank.data.Card;
-import com.example.hw14.cashmachine.bank.service.CardService;
 import com.example.hw14.cashmachine.machine.data.CashMachine;
 import com.example.hw14.cashmachine.machine.data.MoneyBox;
 import com.example.hw14.cashmachine.machine.service.CashMachineService;
+import com.example.hw14.web.auth.Token;
+import com.example.hw14.web.auth.TokenService;
 import com.example.hw14.web.dto.CardDto;
 import com.example.hw14.web.dto.LoginDto;
-import com.example.hw14.web.utils.HexFormatUtils;
+import com.example.hw14.web.dto.NotesDto;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/atm")
 public class CashMachineController {
     private final CashMachine cashMachine;
     private final CashMachineService cashMachineService;
-    private final CardsDao cardsDao;
-    private final AccountDao accountDao;
-    private final CardService cardService;
+    private final TokenService tokenService;
 
+    @Resource(name = "sessionScopedToken")
     private Token token;
 
-    public CashMachineController(CashMachineService cashMachineService, CardsDao cardsDao, CardService cardService, AccountDao accountDao) {
+    public CashMachineController(CashMachineService cashMachineService, TokenService tokenService) {
         var moneyBox = new MoneyBox();
         cashMachine = new CashMachine(moneyBox);
 
+        this.tokenService = tokenService;
         this.cashMachineService = cashMachineService;
-        this.cardsDao = cardsDao;
-        this.accountDao = accountDao;
-        this.cardService = cardService;
     }
 
     @GetMapping
@@ -47,10 +40,8 @@ public class CashMachineController {
 
     @PostMapping("/login")
     public String login(@ModelAttribute("dto") LoginDto dto) {
-        Card card = cardsDao.getCardByNumber(dto.number());
-        String hash = HexFormatUtils.getHash(dto.pin());
-        if (card != null && card.getPinCode().equals(hash)) {
-            this.token = new Token(dto.number(), dto.pin());
+        if (tokenService.checkAuthenticationData(dto)) {
+            tokenService.setAuthenticationData(token, dto.number(), dto.pin());
             return "redirect:/atm/homepage";
         }
         return "redirect:/atm/card/new";
@@ -58,7 +49,7 @@ public class CashMachineController {
 
     @GetMapping("/logout")
     public String logout() {
-        token = null;
+        tokenService.logout(token);
         return "redirect:/atm";
     }
 
@@ -74,13 +65,9 @@ public class CashMachineController {
 
     @PostMapping("/card/create")
     public String createCard(@ModelAttribute("card") CardDto card) {
-        Card newCard = cardService.createCard(card.number(), card.accountId(), HexFormatUtils.getHash(card.pinCode()));
-        accountDao.saveAccount(new Account(card.accountId(), BigDecimal.ZERO));
-        if (newCard != null) {
-            this.token = new Token(card.number(), card.pinCode());
-            return "redirect:/atm/homepage";
-        }
-        throw new AtmRestException("Что-то пошло не так");
+        cashMachineService.createCard(card.number(), card.accountId(), card.pinCode());
+        tokenService.setAuthenticationData(token, card.number(), card.pinCode());
+        return "redirect:/atm/homepage";
     }
 
     @GetMapping("get-money")
@@ -90,28 +77,24 @@ public class CashMachineController {
 
     @PostMapping("get-money")
     public String getMoney(@RequestParam("amount") String amount) {
-        cashMachineService.getMoney(cashMachine, token.number(), token.pin, new BigDecimal(amount));
+        cashMachineService.getMoney(cashMachine, token.getCardNumber(), token.getPinCode(), new BigDecimal(amount));
         return "success-operation-page";
     }
 
     @GetMapping("put-money")
-    public String putMoneyPage() {
+    public String putMoneyPage(@ModelAttribute("notes") NotesDto notes) {
         return "put-money";
     }
 
     @PostMapping("put-money")
-    public String putMoney(@RequestParam("count") Integer count, @RequestParam("note") Integer note) {
-        List<Integer> notes = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            notes.add(note);
-        }
-        cashMachineService.putMoney(cashMachine, token.number(), token.pin(), notes);
+    public String putMoney(@ModelAttribute("notes") NotesDto notes) {
+        cashMachineService.putMoney(cashMachine, token.getCardNumber(), token.getPinCode(), notes.toList());
         return "success-operation-page";
     }
 
     @GetMapping("check-balance")
     public String checkBalance(Model model) {
-        BigDecimal balance = cashMachineService.checkBalance(cashMachine, token.number(), token.pin());
+        BigDecimal balance = cashMachineService.checkBalance(cashMachine, token.getCardNumber(), token.getPinCode());
         model.addAttribute("balance", balance);
         return "check-balance";
     }
@@ -123,17 +106,8 @@ public class CashMachineController {
 
     @PostMapping("change-pin")
     public String changePin(@RequestParam("newPin") String newPin) {
-        cashMachineService.changePin(token.number, token.pin, newPin);
+        cashMachineService.changePin(token.getCardNumber(), token.getPinCode(), newPin);
+        tokenService.setAuthenticationData(token, token.getCardNumber(), newPin);
         return "success-operation-page";
     }
-
-    private record Token(String number, String pin) {
-    }
-
-    private static class AtmRestException extends RuntimeException {
-        public AtmRestException(String message) {
-            super(message);
-        }
-    }
-
 }

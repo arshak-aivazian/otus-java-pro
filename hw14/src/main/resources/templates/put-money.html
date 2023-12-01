@@ -5,13 +5,20 @@
 </head>
 <body>
 <p>Введите значение номинала и количество купюр, которые хотите внести<p>
-<form th:method="POST" th:action="@{/atm/put-money}">
+<form th:method="POST" th:action="@{/atm/put-money}" th:object="${notes}">
     <fieldset>
-        <p>Номинал</p>
-        <input type="number" name="note" />
+        <label for="note100">100: </label>
+        <input type="number" id="note100" th:field="*{note100}"/>
         <br/>
-        <p>Количество купюр</p>
-        <input type="number" name="count" />
+        <label for="note100">500: </label>
+        <input type="number" id="note500" th:field="*{note500}"/>
+        <br/>
+        <label for="note1000">1000: </label>
+        <input type="number" id="note1000" th:field="*{note1000}"/>
+        <br/>
+        <label for="note5000">5000: </label>
+        <input type="number" id="note5000" th:field="*{note5000}"/>
+        <br/>
         <input type="submit" value="Внести" />
     </fieldset>
 </form>

@@ -1,10 +1,12 @@
 package com.example.hw14.cashmachine.machine.service.impl;
 
+import com.example.hw14.cashmachine.bank.data.Card;
 import com.example.hw14.cashmachine.bank.service.AccountService;
 import com.example.hw14.cashmachine.bank.service.CardService;
 import com.example.hw14.cashmachine.machine.data.CashMachine;
 import com.example.hw14.cashmachine.machine.service.CashMachineService;
 import com.example.hw14.cashmachine.machine.service.MoneyBoxService;
+import com.example.hw14.web.utils.HexFormatUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -63,5 +65,11 @@ public class CashMachineServiceImpl implements CashMachineService {
     @Override
     public boolean changePin(String cardNum, String oldPin, String newPin) {
         return cardService.cnangePin(cardNum, oldPin, newPin);
+    }
+
+    @Override
+    public Card createCard(String number, Long accountId, String pin) {
+        accountService.createAccount(accountId, BigDecimal.ZERO);
+        return cardService.createCard(number, accountId, HexFormatUtils.getHash(pin));
     }
 }

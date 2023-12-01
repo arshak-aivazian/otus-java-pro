@@ -5,7 +5,7 @@ import com.example.hw14.cashmachine.bank.data.Account;
 import java.math.BigDecimal;
 
 public interface AccountService {
-    Account createAccount(BigDecimal amount);
+    Account createAccount(Long id, BigDecimal amount);
 
     Account getAccount(Long id);
 

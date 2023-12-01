@@ -16,8 +16,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account createAccount(BigDecimal amount) {
-        Account newAccount = new Account(0, amount);
+    public Account createAccount(Long id, BigDecimal amount) {
+        Account newAccount = new Account(id, amount);
         return accountDao.saveAccount(newAccount);
     }
 
