@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Банкомат</title>
+</head>
+<body>
+<p>Самодельный банкомат, рад приветствовать Вас.<p>
+<p>Пожалуйста, введите номер карты и пароль.<p>
+
+<form th:method="POST" th:action="@{/atm/login}" th:object="${dto}">
+    <label for="number">Номер карты: </label>
+    <input type="text" id="number" th:field="*{number}"/>
+    <br/>
+    <label for="pin">Пин-код: </label>
+    <input type="text" id="pin" th:field="*{pin}"/>
+    <br/>
+    <input type="submit" value="Войти!"/>
+</form>
+<a class="button" th:href="@{/atm/card/new}">
+    <button>Зарегистрировать новую карту</button>
+</a>
+</body>
+</html>

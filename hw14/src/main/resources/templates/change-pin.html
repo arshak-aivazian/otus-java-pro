@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Банкомат</title>
+</head>
+<body>
+<p>Введите новый пин<p>
+<form th:method="POST" th:action="@{/atm/change-pin}">
+    <fieldset>
+        <input type="text" name="newPin" />
+        <input type="submit" value="Поменять" />
+    </fieldset>
+</form>
+</body>
+</html>
